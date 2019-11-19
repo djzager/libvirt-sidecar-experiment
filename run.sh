@@ -23,5 +23,7 @@ iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 iptables -A FORWARD -i br0 -o eth0 -j ACCEPT
 
-/usr/sbin/libvirtd &
+ip addr show
+/usr/sbin/virtlogd &
+/usr/sbin/libvirtd --listen &
 wait
