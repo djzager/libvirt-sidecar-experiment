@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: install-bm-config
+spec:
+  hostNetwork: true
+  containers:
+    - name: libvirt
+      image: docker.io/djzager/libvirt:latest
+      imagePullPolicy: Always
+      securityContext:
+        privileged: true
+    - name: installer
+      image: ${OpenShift Installer Image}
+      imagePullPolicy: Always
+      command:
+        - /usr/bin/openshift-install
+      args:
+        - create
+        - cluster
+        - --log-level
+        - debug
+        - --dir
+        - /ocp
+      securityContext:
+        privileged: true
+      volumeMounts:
+        - name: config-volume
+          mountPath: /ocp
+  volumes:
+    - name: config-volume
+      configMap:
+        name: install-bm-config
