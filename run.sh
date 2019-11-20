@@ -14,16 +14,15 @@ if [ ! -e /dev/net/tun ]; then
 fi
 
 # Create default pridge for libvirt
-ip link add br0 type bridge
-ip link set dev br0 up
-ip addr add dev br0 192.168.66.02/24
+# ip link add br0 type bridge
+# ip link set dev br0 up
+# ip addr add dev br0 192.168.66.02/24
 
 # Set iptables rules so that all VMs can reach the outside world
-iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-iptables -A FORWARD -i br0 -o eth0 -j ACCEPT
+# iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+# iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+# iptables -A FORWARD -i br0 -o eth0 -j ACCEPT
 
-ip addr show
 /usr/sbin/virtlogd &
 /usr/sbin/libvirtd --listen &
 wait
