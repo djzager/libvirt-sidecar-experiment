@@ -28,7 +28,7 @@ spec:
         - --dir
         - /ocp
       env:
-        - name: OPENSHIFT_RELEASE_IMAGE
+        - name: OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE
           value: "registry.svc.ci.openshift.org/ocp/release:4.3.0-0.nightly-2019-12-03-032607"
       securityContext:
         privileged: true
