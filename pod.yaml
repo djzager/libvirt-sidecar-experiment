@@ -16,9 +16,7 @@ spec:
         - name: image-cache
           mountPath: /output
     - name: installer
-      # baremetal installer from registry.svc.ci.openshift.org/ocp/release:4.3.0-0.ci-2019-11-22-122829
-      # TODO: figure out how to get ci pull secrets into CRC VM
-      image: docker.io/djzager/installer:libvirt
+      image: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:2d0cb0f49dc4f3e99a9b571967ee3f8710fc57c68b858b51ea99a24dd230dcd1
       imagePullPolicy: Always
       command:
         - /usr/bin/openshift-install
@@ -29,6 +27,9 @@ spec:
         - debug
         - --dir
         - /ocp
+      env:
+        - name: OPENSHIFT_RELEASE_IMAGE
+          value: "registry.svc.ci.openshift.org/ocp/release:4.3.0-0.nightly-2019-12-03-032607"
       securityContext:
         privileged: true
       volumeMounts:
