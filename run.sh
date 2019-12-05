@@ -3,9 +3,9 @@
 set -ex
 
 # Try to create /dev/kvm if it does not exist
-# if [ ! -e /dev/kvm ]; then
-#    mknod /dev/kvm c 10 $(grep '\<kvm\>' /proc/misc | cut -f 1 -d' ')
-# fi
+if [ ! -e /dev/kvm ]; then
+   mknod /dev/kvm c 10 $(grep '\<kvm\>' /proc/misc | cut -f 1 -d' ')
+fi
 
 # Try to create /dev/net/tun if it does not exist
 if [ ! -e /dev/net/tun ]; then
