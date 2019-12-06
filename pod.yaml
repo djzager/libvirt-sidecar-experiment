@@ -16,7 +16,7 @@ spec:
         - name: image-cache
           mountPath: /output
     - name: installer
-      image: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:2d0cb0f49dc4f3e99a9b571967ee3f8710fc57c68b858b51ea99a24dd230dcd1
+      image: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:aade5e3e89521255027d8a8fd7c2ef64ef44d519db19826f28b6e409dca64b33
       imagePullPolicy: Always
       command:
         - /usr/bin/openshift-install
@@ -29,7 +29,7 @@ spec:
         - /ocp
       env:
         - name: OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE
-          value: "registry.svc.ci.openshift.org/ocp/release:4.3.0-0.nightly-2019-12-03-032607"
+          value: "registry.svc.ci.openshift.org/ocp/release:4.3.0-0.nightly-2019-12-06-094536"
       securityContext:
         privileged: true
       volumeMounts:
