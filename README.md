@@ -1,14 +1,5 @@
-```
-sudo podman build . -t libvirt
-sudo podman run \
-  --rm -it \
-  --user root \
-  --net host \
-  --privileged \
-  -v /etc/sysconfig/network-scripts:/etc/sysconfig/network-scripts \
-  -v ${DEV_SCRIPTS}/cache:/output \
-  libvirt
-```
+
+[Demo Video](https://www.youtube.com/watch?v=NT7uaxRoAdg)
 
 # Libvirt Sidecar Experiment
 
@@ -22,9 +13,12 @@ installer container.
    cores, 125G memory, and space allocations of 50G (root partition), 100G
    (/var/lib/libvirt/images, 100G (/opt).
 1. Pull-secrets to access registry.svc.ci.openshift.org.
-1. podman installed
+1. `podman` installed. This should be taken care of by
+   `./01_install_requirements.sh` provided by [dev-scripts](https://github.com/openshift-metal3/dev-scripts).
 1. [dev-scripts](https://github.com/openshift-metal3/dev-scripts) cloned.
-1. [crc](https://github.com/code-ready/crc) installed
+1. [crc](https://github.com/code-ready/crc) or
+   [minikube](https://kubernetes.io/docs/tasks/tools/install-minikube/)
+   installed to act as the provisioning cluster.
 
 ## Setup
 
@@ -51,7 +45,7 @@ installer container.
     1. Modify `./utils.sh` to comment out the line that runs `create cluster` and exit at that point.
     1. Start the libvirt container with `sudo podman run --rm -it --user root --net host --privileged -v /etc/sysconfig/network-scripts:/etc/sysconfig/network-scripts -v $PWD/cache:/output docker.io/djzager/libvirt`
     2. Ran `./06_create_cluster.sh` that has been modified to create the manifests and exit.
-9. Configure the CodeReadyContainers (CRC) VM.
+9. Configure the provisoning cluster, in this case, a Code Ready Containers (CRC) VM.
     1. Run `crc start --cpus 8 --memory 32768`. Make sure that you use the same pull-secret you are using with dev-scripts so that the CRC VM can pull the appropriate images.
     2. Modify the `crc` domain to include interfaces on the `baremetal` and
        `provisioning` networks -- `sudo virsh edit crc`:
@@ -128,3 +122,6 @@ installer container.
     oc create configmap ocp --from-file ocp/install-config.yaml --from-file ocp/install-config.yaml.tmp --from-file ocp/master_nodes.json
     ```
 1. Create the [Pod](pod.yaml) -- `oc create -f pod.yaml`
+1. The machine-api will not start until the `metal3-config` ConfigMap is created
+   in the `openshift-machine-api` namespace. Create it using `oc create -f
+   ocp/deploy/metal3-config.yaml`. [Related issue](https://github.com/openshift/installer/pull/2449).
