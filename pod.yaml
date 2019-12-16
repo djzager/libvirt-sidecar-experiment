@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: baremetal-install
+spec:
+  hostNetwork: true
+  restartPolicy: Never
+  containers:
+    - name: libvirt
+      image: docker.io/djzager/libvirt:netstart
+      imagePullPolicy: Always
+      securityContext:
+        privileged: true
+      volumeMounts:
+        # This is to share the cached images retrieved by the installer
+        # needed when starting the bootstrap VM
+        - name: image-cache
+          mountPath: /output
+    - name: installer
+      # To get the installer image:
+      # oc adm release info ${OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE} -o json | \
+      #    jq -r '.references.spec.tags[] | select(.name == "baremetal-installer") | .from.name'
+      image: quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:aade5e3e89521255027d8a8fd7c2ef64ef44d519db19826f28b6e409dca64b33
+      imagePullPolicy: Always
+      command:
+        - /usr/bin/openshift-install
+      args:
+        - create
+        - cluster
+        - --log-level
+        - debug
+        - --dir
+        - /ocp
+      env:
+        # MUST override the default release payload used by the installer
+        - name: OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE
+          value: "registry.svc.ci.openshift.org/ocp/release:4.3.0-0.nightly-2019-12-06-094536"
+      securityContext:
+        privileged: true
+      volumeMounts:
+        - name: image-cache
+          mountPath: /output
+        - name: ocp-dir
+          mountPath: /ocp
+  initContainers:
+    - name: copy-config
+      image: busybox
+      # Need this to put all of the install manifests into a structure the installer can consume
+      command: ['sh', '-c', 'mkdir -p /ocp/deploy /ocp/openshift /ocp/manifests; cp /ocp-config/* /ocp; cp /deploy-config/* /ocp/deploy; cp /openshift-config/* /ocp/openshift; cp /manifests-config/* /ocp/manifests']
+      volumeMounts:
+        - name: ocp-dir
+          mountPath: /ocp
+        - name: ocp-config
+          mountPath: /ocp-config
+        - name: deploy-config
+          mountPath: /deploy-config
+        - name: openshift-config
+          mountPath: /openshift-config
+        - name: manifests-config
+          mountPath: /manifests-config
+  volumes:
+    - name: ocp-dir
+      emptyDir: {}
+    - name: image-cache
+      emptyDir: {}
+    - name: ocp-config
+      configMap:
+        name: ocp
+    - name: deploy-config
+      configMap:
+        name: deploy
+    - name: openshift-config
+      configMap:
+        name: openshift
+    - name: manifests-config
+      configMap:
+        name: manifests
